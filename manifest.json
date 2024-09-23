@@ -1,0 +1,22 @@
+{
+  "manifest_version": 2,
+  "name": "Copy URL to Clipboard",
+  "version": "1.0",
+  "description": "Copies the current page's URL to the clipboard using a keyboard shortcut.",
+  "permissions": ["activeTab", "clipboardWrite"],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "commands": {
+    "copy-url": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+U",
+        "mac": "Command+Shift+U"
+      },
+      "description": "Copy the current page's URL to the clipboard"
+    }
+  },
+  "icons": {
+    "48": "icons/icon.png"
+  }
+}
