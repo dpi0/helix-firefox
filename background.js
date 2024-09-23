@@ -43,35 +43,36 @@ function switchTabs() {
   });
 }
 
-// Function to handle context menu click
-function handleContextMenuClick(info, tab) {
-  if (info.menuItemId === "removePlaylist") {
-    const url = new URL(info.linkUrl);
-    if (url.hostname === "www.youtube.com" && url.searchParams.has("v")) {
-      const videoId = url.searchParams.get("v");
-      const newUrl = `https://www.youtube.com/watch?v=${videoId}`;
-      chrome.tabs.create({ url: newUrl });
-    }
+// Function to remove playlist part from YouTube URLs and open the video in a new tab
+function removePlaylist(tab) {
+  const url = new URL(tab.url);
+  if (url.hostname === "www.youtube.com" && url.searchParams.has("v")) {
+    const videoId = url.searchParams.get("v");
+    const newUrl = `https://www.youtube.com/watch?v=${videoId}`;
+    chrome.tabs.create({ url: newUrl });
   }
 }
 
-// Function to remove playlist part from YouTube URLs and open the video in a new tab
-function removePlaylist() {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    const url = new URL(tabs[0].url);
-    if (url.hostname === "www.youtube.com" && url.searchParams.has("v")) {
-      const videoId = url.searchParams.get("v");
-      const newUrl = `https://www.youtube.com/watch?v=${videoId}`;
-      chrome.tabs.create({ url: newUrl });
-    }
-  });
+// Function to handle context menu click
+function handleContextMenuClick(info, tab) {
+  if (info.menuItemId === "copyCurrentUrl") {
+    copyUrl();
+  } else if (info.menuItemId === "removePlaylist") {
+    removePlaylist(tab);
+  }
 }
 
-// Create the context menu item
+// Create the context menu items
+chrome.contextMenus.create({
+  id: "copyCurrentUrl",
+  title: "Copy Current URL",
+  contexts: ["all"],
+});
+
 chrome.contextMenus.create({
   id: "removePlaylist",
   title: "Open in New Tab without Playlist",
-  contexts: ["link"],
+  contexts: ["all"],
 });
 
 // Listen for commands
@@ -81,7 +82,9 @@ chrome.commands.onCommand.addListener((command) => {
   } else if (command === "switch-tabs") {
     switchTabs();
   } else if (command === "remove-playlist") {
-    removePlaylist();
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      removePlaylist(tabs[0]);
+    });
   }
 });
 
