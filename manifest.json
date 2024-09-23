@@ -3,7 +3,7 @@
   "name": "Utility Tools",
   "version": "1.0",
   "description": "A collection of small utility tasks.",
-  "permissions": ["activeTab", "clipboardWrite", "tabs"],
+  "permissions": ["activeTab", "clipboardWrite", "tabs", "contextMenus"],
   "background": {
     "scripts": ["background.js"]
   },
@@ -21,6 +21,13 @@
         "mac": "Command+Shift+T"
       },
       "description": "Switch to the previously active tab"
+    },
+    "remove-playlist": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Remove playlist part from YouTube URLs and open the video in a new tab"
     }
   },
   "icons": {

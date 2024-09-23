@@ -1,27 +1,23 @@
-// background.js
-
 let previousTabId = null;
 
-browser.commands.onCommand.addListener((command) => {
-  if (command === "copy-url") {
-    browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-      const url = tabs[0].url;
-      navigator.clipboard
-        .writeText(url)
-        .then(() => {
-          console.log("URL copied to clipboard:", url);
-        })
-        .catch((error) => {
-          console.error("Failed to copy URL to clipboard:", error);
-        });
-    });
-  } else if (command === "switch-tabs") {
-    switchTabs();
-  }
-});
+// Function to handle copying the current page's URL to the clipboard
+function copyUrl() {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const url = tabs[0].url;
+    navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        console.log("URL copied to clipboard:", url);
+      })
+      .catch((error) => {
+        console.error("Failed to copy URL to clipboard:", error);
+      });
+  });
+}
 
+// Function to switch to the previously active tab
 function switchTabs() {
-  browser.tabs.query({ currentWindow: true }).then((tabs) => {
+  chrome.tabs.query({ currentWindow: true }, (tabs) => {
     const activeTab = tabs.find((tab) => tab.active);
     if (previousTabId === null) {
       previousTabId = activeTab.id;
@@ -34,7 +30,7 @@ function switchTabs() {
       return;
     }
 
-    browser.tabs
+    chrome.tabs
       .update(previousTab.id, { active: true })
       .then(() => {
         const temp = previousTabId;
@@ -47,6 +43,52 @@ function switchTabs() {
   });
 }
 
-browser.tabs.onActivated.addListener((activeInfo) => {
+// Function to handle context menu click
+function handleContextMenuClick(info, tab) {
+  if (info.menuItemId === "removePlaylist") {
+    const url = new URL(info.linkUrl);
+    if (url.hostname === "www.youtube.com" && url.searchParams.has("v")) {
+      const videoId = url.searchParams.get("v");
+      const newUrl = `https://www.youtube.com/watch?v=${videoId}`;
+      chrome.tabs.create({ url: newUrl });
+    }
+  }
+}
+
+// Function to remove playlist part from YouTube URLs and open the video in a new tab
+function removePlaylist() {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const url = new URL(tabs[0].url);
+    if (url.hostname === "www.youtube.com" && url.searchParams.has("v")) {
+      const videoId = url.searchParams.get("v");
+      const newUrl = `https://www.youtube.com/watch?v=${videoId}`;
+      chrome.tabs.create({ url: newUrl });
+    }
+  });
+}
+
+// Create the context menu item
+chrome.contextMenus.create({
+  id: "removePlaylist",
+  title: "Open in New Tab without Playlist",
+  contexts: ["link"],
+});
+
+// Listen for commands
+chrome.commands.onCommand.addListener((command) => {
+  if (command === "copy-url") {
+    copyUrl();
+  } else if (command === "switch-tabs") {
+    switchTabs();
+  } else if (command === "remove-playlist") {
+    removePlaylist();
+  }
+});
+
+// Listen for context menu clicks
+chrome.contextMenus.onClicked.addListener(handleContextMenuClick);
+
+// Update previousTabId when a tab is activated
+chrome.tabs.onActivated.addListener((activeInfo) => {
   previousTabId = activeInfo.previousTabId;
 });
