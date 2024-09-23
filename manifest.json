@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "Utility Tools",
+  "name": "Helix - Utility Tools",
   "version": "1.0",
-  "description": "A collection of small utility tasks.",
+  "description": "A collection of small utility tools.",
   "permissions": ["activeTab", "clipboardWrite", "tabs", "contextMenus"],
   "background": {
     "scripts": ["background.js"]
@@ -10,27 +10,24 @@
   "commands": {
     "copy-url": {
       "suggested_key": {
-        "default": "Ctrl+Shift+U",
-        "mac": "Command+Shift+U"
+        "default": "Alt+M"
       },
       "description": "Copy the current page's URL to the clipboard"
     },
     "switch-tabs": {
       "suggested_key": {
-        "default": "Ctrl+Shift+T",
-        "mac": "Command+Shift+T"
+        "default": "Alt+A"
       },
       "description": "Switch to the previously active tab"
     },
     "remove-playlist": {
       "suggested_key": {
-        "default": "Ctrl+Shift+Y",
-        "mac": "Command+Shift+Y"
+        "default": "Ctrl+Shift+Y"
       },
       "description": "Remove playlist part from YouTube URLs and open the video in a new tab"
     }
   },
   "icons": {
-    "48": "icons/icon.png"
+    "48": "icons/helix-48.png"
   }
 }
